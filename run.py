@@ -72,7 +72,7 @@ def setup_logging(log_file: str = None):
 class Evaluator:
     def __init__(self):
         self.logger = logging.getLogger(__name__)
-        self.model = LLaMAModel("TinyLlama/TinyLlama-1.1B-Chat-v1.0")
+        self.model = LLaMAModel("TinyLlama/TinyLlama_v1.1_math_code")
         self.data_loader = DataLoader()
 
     def evaluate_sample_by_index(self, index: int) -> Dict:
@@ -89,7 +89,7 @@ class Evaluator:
         expected = example["target"]
         predicted = self.model.generate_answer(
             question,
-            max_new_tokens=256
+            max_new_tokens=180
         )
 
         # Collect and return results for the specific sample

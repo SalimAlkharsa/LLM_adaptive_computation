@@ -34,12 +34,9 @@ class LLaMAModel:
             raise
 
     def generate_answer(self, question: str, prepended_context: str = "", max_new_tokens: int = 128) -> str:
-        prompt_template = """[INST] You are a helpful math assistant. Please solve this step by step:
-
-{question}
-
-Let's approach this step by step:
-[/INST]"""
+        prompt_template = """Question:: {question} 
+        Please solve this step-by-step and only provide the solution.
+        Solution::"""
         
         full_input = prompt_template.format(question=question)
         inputs = self.tokenizer(full_input, return_tensors="pt", padding=True, truncation=True)
@@ -48,10 +45,10 @@ Let's approach this step by step:
         outputs = self.model.generate(
             **inputs,
             max_new_tokens=max_new_tokens,
-            temperature=0.1,
+            temperature=0.7,
             top_p=0.95,
-            do_sample=False,  # Deterministic generation for CPU
-            num_beams=1,
+            do_sample=True,
+            num_beams=3,
             pad_token_id=self.tokenizer.pad_token_id,
             eos_token_id=self.tokenizer.eos_token_id,
         )

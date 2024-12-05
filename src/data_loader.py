@@ -9,7 +9,7 @@ class DataLoader:
         self.train_data = None
         self.test_data = None
 
-    def load_data(self, max_train_samples: int = 100, max_test_samples: int = 100) -> None:
+    def load_data(self, max_train_samples: int = 100, max_test_samples: int = 1319) -> None:
         self.logger.info("Loading GSM8K dataset...")
         self.dataset = load_dataset("gsm8k", "socratic")
         
