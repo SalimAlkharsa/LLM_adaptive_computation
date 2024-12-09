@@ -32,17 +32,46 @@ def train_model(model, train_loader, optimizer, criterion, device):
 # Evaluation loop
 def evaluate_model(model, test_loader, tag2idx, device):
     model.eval()
-    correct, total = 0, 0
+    correct_entities, total_entities = 0, 0
+    correct_relationships, total_relationships = 0, 0
+
     with torch.no_grad():
         for sentences, labels in test_loader:
             sentences, labels = sentences.to(device), labels.to(device)
+
+            # Model outputs: two separate logits tensors
             entities_outputs, relationship_outputs = model(sentences)
-            predictions = torch.argmax(entities_outputs, dim=-1)
-            relationship_outputs = torch.argmax(relationship_outputs, dim=-1)
-            mask = labels != tag2idx["<PAD>"]
-            correct += (predictions[mask] == labels[mask]).sum().item()
-            total += mask.sum().item()
-    return correct / total
+
+            # Predictions for entities and relationships
+            entity_predictions = torch.argmax(entities_outputs, dim=-1)  # [batch_size, seq_len]
+            relationship_predictions = torch.argmax(relationship_outputs, dim=-1)  # [batch_size, seq_len]
+
+            # Separate masks for each label type
+            mask_entities = labels != tag2idx["<PAD>"]  # Adjust if entity and relationship masks differ
+            mask_relationships = mask_entities  # Assuming same mask; change if needed.
+
+            # Evaluate entities
+            masked_entity_predictions = entity_predictions[mask_entities]
+            masked_entity_labels = labels[mask_entities]
+            correct_entities += (masked_entity_predictions == masked_entity_labels).sum().item()
+            total_entities += mask_entities.sum().item()
+
+            # Evaluate relationships
+            masked_relationship_predictions = relationship_predictions[mask_relationships]
+            masked_relationship_labels = labels[mask_relationships]
+            correct_relationships += (masked_relationship_predictions == masked_relationship_labels).sum().item()
+            total_relationships += mask_relationships.sum().item()
+
+    # Calculate separate accuracies
+    entity_accuracy = correct_entities / total_entities if total_entities > 0 else 0
+    relationship_accuracy = correct_relationships / total_relationships if total_relationships > 0 else 0
+
+    print(f"Entity Accuracy: {entity_accuracy:.2%}")
+    print(f"Relationship Accuracy: {relationship_accuracy:.2%}")
+
+    # Return combined accuracy if desired
+    combined_accuracy = (correct_entities + correct_relationships) / (total_entities + total_relationships)
+    return combined_accuracy
 
 if __name__ == "__main__":
     # Load and preprocess dataset
@@ -88,11 +117,11 @@ if __name__ == "__main__":
     # Initialize model, optimizer, and criterion
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model = BiLSTMTagger(len(word2idx), len(tag2idx)).to(device)
-    optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.0001)
     criterion = nn.CrossEntropyLoss(ignore_index=tag2idx["<PAD>"])
     
     # Train and evaluate
-    for epoch in range(35):  # Adjust number of epochs as needed
+    for epoch in range(100):  # Adjust number of epochs as needed
         train_loss = train_model(model, train_loader, optimizer, criterion, device)
         print(f"Epoch {epoch+1}, Loss: {train_loss:.4f}")
     

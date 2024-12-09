@@ -35,7 +35,7 @@ def save_parsed_logs(parsed_data, output_file):
 
 # Example usage
 input_file = 'first_batch.log'
-output_file = 'parsed_output_TEST.log'
+output_file = 'PARSED_FINAL_output_TEST.log'
 
 parsed_data = parse_logs(input_file)
 save_parsed_logs(parsed_data, output_file)

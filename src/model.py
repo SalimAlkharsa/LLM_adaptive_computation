@@ -34,9 +34,9 @@ class LLaMAModel:
             raise
 
     def generate_answer(self, question: str, prepended_context: str = "", max_new_tokens: int = 128) -> str:
-        prompt_template = """Question:: {question} 
+        prompt_template = """Question: {question} 
         Please solve this step-by-step and only provide the solution.
-        Solution::"""
+        Solution:"""
         
         full_input = prompt_template.format(question=question)
         inputs = self.tokenizer(full_input, return_tensors="pt", padding=True, truncation=True)

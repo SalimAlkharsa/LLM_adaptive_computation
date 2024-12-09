@@ -18,7 +18,7 @@ import torch.nn as nn
 
 
 class BiLSTMTagger(nn.Module):
-    def __init__(self, vocab_size, tagset_size, embedding_dim=128, hidden_dim=256, num_layers=2, dropout_prob=0.3):
+    def __init__(self, vocab_size, tagset_size, embedding_dim=256, hidden_dim=512, num_layers=2, dropout_prob=0.3):
         """
         BiLSTM Model with Multi-layer LSTM and Dropout
         """
