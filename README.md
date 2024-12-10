@@ -1,5 +1,7 @@
 # LLM Adaptive Computation
 
+Note this is not fully up to data
+
 A project for evaluating LLaMA models on mathematical reasoning tasks using the GSM8K dataset.
 
 ## Overview
